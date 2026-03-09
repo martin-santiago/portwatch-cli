@@ -1,4 +1,4 @@
-BINARY = portwatch
+BINARY = pw
 BUILD_DIR = build
 
 .PHONY: build run clean install uninstall

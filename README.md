@@ -62,13 +62,13 @@ make run
 ### Install globally
 
 ```bash
-make install    # copies to /usr/local/bin/portwatch
+make install    # copies to /usr/local/bin/pw
 ```
 
 Now run it from **any directory**:
 
 ```bash
-portwatch
+pw
 ```
 
 ## Usage
@@ -78,7 +78,7 @@ portwatch
 Just type:
 
 ```bash
-portwatch
+pw
 ```
 
 #### Keyboard shortcuts
@@ -107,41 +107,41 @@ Perfect for scripting, cron jobs, or quick one-liners:
 
 ```bash
 # List all listening ports
-portwatch list
+pw list
 
 # List only filtered ports
-portwatch list --filter
+pw list --filter
 
 # Kill everything on port 3001
-portwatch kill 3001
+pw kill 3001
 
 # Kill a specific PID
-portwatch kill 12345 --pid
+pw kill 12345 --pid
 
 # Show current filter config
-portwatch filter
+pw filter
 
 # Toggle filter on/off
-portwatch filter on
-portwatch filter off
-portwatch filter toggle
+pw filter on
+pw filter off
+pw filter toggle
 
 # Add/remove ports from filter
-portwatch filter add 4000
-portwatch filter rm 4000
+pw filter add 4000
+pw filter rm 4000
 
 # Help
-portwatch help
+pw help
 ```
 
 ### One-liner examples
 
 ```bash
 # Kill all node processes on dev ports
-portwatch list --filter | grep node | awk '{print $2}' | xargs kill
+pw list --filter | grep node | awk '{print $2}' | xargs kill
 
 # Check if port 3001 is in use
-portwatch list | grep :3001 && echo "Port 3001 is in use"
+pw list | grep :3001 && echo "Port 3001 is in use"
 ```
 
 ## Configuration
@@ -165,7 +165,7 @@ Stored at `~/.portwatch.json` (shared with [PortWatch](https://github.com/martin
 ## How It Works
 
 ```
-portwatch (no args)              portwatch list|kill|filter
+pw (no args)                     pw list|kill|filter
        │                                   │
        ▼                                   ▼
   Interactive TUI                  Non-interactive CLI
@@ -191,9 +191,9 @@ portwatch (no args)              portwatch list|kill|filter
 
 | Command | Description |
 |---|---|
-| `make build` | Build binary to `build/portwatch` |
+| `make build` | Build binary to `build/pw` |
 | `make run` | Build and run |
-| `make install` | Install to `/usr/local/bin/portwatch` (global) |
+| `make install` | Install to `/usr/local/bin/pw` (global) |
 | `make uninstall` | Remove from `/usr/local/bin/` |
 | `make clean` | Delete `build/` directory |
 
