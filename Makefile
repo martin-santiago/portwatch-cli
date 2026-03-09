@@ -1,4 +1,4 @@
-BINARY = portwatch-cli
+BINARY = portwatch
 BUILD_DIR = build
 
 .PHONY: build run clean install uninstall

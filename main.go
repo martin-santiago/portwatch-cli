@@ -35,7 +35,7 @@ func handleCLIArgs() {
 	case "help", "-h", "--help":
 		printHelp()
 	case "version", "-v", "--version":
-		fmt.Println("portwatch-cli v1.0.0")
+		fmt.Println("portwatch v1.0.0")
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", cmd)
 		printHelp()
@@ -202,11 +202,11 @@ func manageFilter(args []string) {
 }
 
 func printHelp() {
-	fmt.Print(`portwatch-cli — Monitor listening ports and kill processes
+	fmt.Print(`portwatch — Monitor listening ports and kill processes
 
 USAGE
-  portwatch-cli                   Interactive TUI mode
-  portwatch-cli <command>         Non-interactive mode
+  portwatch                   Interactive TUI mode
+  portwatch <command>         Non-interactive mode
 
 COMMANDS
   list, ls            List all listening ports
@@ -222,7 +222,7 @@ COMMANDS
   version             Show version
 
 INTERACTIVE KEYS
-  ↑/↓          Navigate port list
+  ↑/↓  j/k     Navigate port list
   enter/x      Kill selected process
   f            Toggle filter mode
   e            Edit filter list

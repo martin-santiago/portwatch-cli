@@ -59,22 +59,26 @@ make build
 make run
 ```
 
-### Install system-wide
+### Install globally
 
 ```bash
-make install    # copies to /usr/local/bin/portwatch-cli
+make install    # copies to /usr/local/bin/portwatch
 ```
 
-Now you can run `portwatch-cli` from anywhere.
+Now run it from **any directory**:
+
+```bash
+portwatch
+```
 
 ## Usage
 
 ### Interactive TUI (default)
 
-Just run it with no arguments:
+Just type:
 
 ```bash
-portwatch-cli
+portwatch
 ```
 
 #### Keyboard shortcuts
@@ -103,46 +107,41 @@ Perfect for scripting, cron jobs, or quick one-liners:
 
 ```bash
 # List all listening ports
-portwatch-cli list
+portwatch list
 
 # List only filtered ports
-portwatch-cli list --filter
+portwatch list --filter
 
 # Kill everything on port 3001
-portwatch-cli kill 3001
+portwatch kill 3001
 
 # Kill a specific PID
-portwatch-cli kill 12345 --pid
+portwatch kill 12345 --pid
 
 # Show current filter config
-portwatch-cli filter
+portwatch filter
 
 # Toggle filter on/off
-portwatch-cli filter on
-portwatch-cli filter off
-portwatch-cli filter toggle
+portwatch filter on
+portwatch filter off
+portwatch filter toggle
 
 # Add/remove ports from filter
-portwatch-cli filter add 4000
-portwatch-cli filter rm 4000
+portwatch filter add 4000
+portwatch filter rm 4000
 
 # Help
-portwatch-cli help
+portwatch help
 ```
 
 ### One-liner examples
 
 ```bash
 # Kill all node processes on dev ports
-portwatch-cli list --filter | grep node | awk '{print $2}' | xargs kill
+portwatch list --filter | grep node | awk '{print $2}' | xargs kill
 
 # Check if port 3001 is in use
-portwatch-cli list | grep :3001 && echo "Port 3001 is in use"
-
-# Alias for quick access
-alias pw='portwatch-cli'
-alias pwl='portwatch-cli list'
-alias pwk='portwatch-cli kill'
+portwatch list | grep :3001 && echo "Port 3001 is in use"
 ```
 
 ## Configuration
@@ -166,7 +165,7 @@ Stored at `~/.portwatch.json` (shared with [PortWatch](https://github.com/martin
 ## How It Works
 
 ```
-portwatch-cli (no args)          portwatch-cli list|kill|filter
+portwatch (no args)              portwatch list|kill|filter
        │                                   │
        ▼                                   ▼
   Interactive TUI                  Non-interactive CLI
@@ -192,16 +191,16 @@ portwatch-cli (no args)          portwatch-cli list|kill|filter
 
 | Command | Description |
 |---|---|
-| `make build` | Build binary to `build/portwatch-cli` |
+| `make build` | Build binary to `build/portwatch` |
 | `make run` | Build and run |
-| `make install` | Copy to `/usr/local/bin/` |
+| `make install` | Install to `/usr/local/bin/portwatch` (global) |
 | `make uninstall` | Remove from `/usr/local/bin/` |
 | `make clean` | Delete `build/` directory |
 
 ## Uninstall
 
 ```bash
-make uninstall              # remove binary
+make uninstall              # remove binary from PATH
 rm ~/.portwatch.json        # remove config (optional)
 ```
 
