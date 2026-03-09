@@ -1,6 +1,6 @@
 # portwatch-cli
 
-> Lightweight terminal UI to monitor listening ports and kill processes — zero dependencies, runs on macOS and Linux.
+> Lightweight terminal UI to monitor listening ports and kill processes — single binary, zero dependencies, runs on macOS and Linux.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -27,61 +27,91 @@
 - **Filter mode** — watch only the ports you care about (e.g., 3001, 3002, 8000)
 - **Persistent config** — filter settings saved to `~/.portwatch.json`
 - **Zero runtime dependencies** — single static binary, `CGO_ENABLED=0`
-- **Tiny footprint** — ~4MB binary, minimal RAM usage
+- **Tiny footprint** — ~2MB binary, minimal RAM usage
 
-## Quick Start
+---
 
-### Prerequisites
+## Installation
 
-| Requirement | Why |
-|---|---|
-| **Go 1.21+** | Build toolchain |
-| **macOS or Linux** | Uses `lsof` (macOS) or `ss`/`netstat` (Linux) |
+### Option 1: Build from source (recommended)
+
+Requires **Go 1.21+**.
 
 ```bash
-# Install Go if needed (macOS)
+# Install Go if needed
+# macOS:
 brew install go
+# Linux (Debian/Ubuntu):
+sudo apt install golang
+# Linux (other): https://go.dev/dl/
 
-# Install Go if needed (Linux)
-sudo apt install golang  # or snap install go --classic
+# Clone, build, and install
+git clone https://github.com/martin-santiago/portwatch-cli.git
+cd portwatch-cli
+make install
 ```
 
-### Build & Run
+This installs the `pw` binary to:
+- **Linux**: `~/.local/bin/pw` (no sudo needed)
+- **macOS**: `/usr/local/bin/pw`
+
+Verify it works:
+
+```bash
+pw version
+```
+
+### Option 2: One-liner install
+
+```bash
+git clone https://github.com/martin-santiago/portwatch-cli.git /tmp/portwatch-cli \
+  && cd /tmp/portwatch-cli \
+  && make install \
+  && cd - \
+  && rm -rf /tmp/portwatch-cli
+```
+
+### Option 3: Manual download
 
 ```bash
 git clone https://github.com/martin-santiago/portwatch-cli.git
 cd portwatch-cli
-
-# Build
 make build
-
-# Run interactive TUI
-make run
+# Binary is at build/pw — copy it wherever you want
+cp build/pw ~/.local/bin/   # Linux
+cp build/pw /usr/local/bin/ # macOS
 ```
 
-### Install globally
+> **Note (Linux):** Make sure `~/.local/bin` is in your `$PATH`. If not, add this to your `~/.bashrc` or `~/.zshrc`:
+> ```bash
+> export PATH="$HOME/.local/bin:$PATH"
+> ```
+
+---
+
+## Quick Start
 
 ```bash
-make install    # copies to /usr/local/bin/pw
-```
-
-Now run it from **any directory**:
-
-```bash
+# Interactive TUI — just type:
 pw
+
+# Or use commands directly:
+pw list          # show all listening ports
+pw kill 3001     # kill everything on port 3001
+pw filter        # show filter config
 ```
+
+---
 
 ## Usage
 
 ### Interactive TUI (default)
 
-Just type:
-
 ```bash
 pw
 ```
 
-#### Keyboard shortcuts
+#### Keyboard shortcuts — Port list
 
 | Key | Action |
 |---|---|
@@ -92,7 +122,7 @@ pw
 | `r` | Force refresh |
 | `q` / `Ctrl+C` | Quit |
 
-#### Filter edit mode
+#### Keyboard shortcuts — Filter editor
 
 | Key | Action |
 |---|---|
@@ -121,12 +151,12 @@ pw kill 12345 --pid
 # Show current filter config
 pw filter
 
-# Toggle filter on/off
+# Enable/disable filter mode
 pw filter on
 pw filter off
 pw filter toggle
 
-# Add/remove ports from filter
+# Add/remove ports from watch list
 pw filter add 4000
 pw filter rm 4000
 
@@ -137,16 +167,21 @@ pw help
 ### One-liner examples
 
 ```bash
-# Kill all node processes on dev ports
+# Kill all node processes on your dev ports
 pw list --filter | grep node | awk '{print $2}' | xargs kill
 
 # Check if port 3001 is in use
-pw list | grep :3001 && echo "Port 3001 is in use"
+pw list | grep :3001 && echo "Port 3001 is busy"
+
+# List ports as a quick check (non-interactive)
+pw ls
 ```
+
+---
 
 ## Configuration
 
-Stored at `~/.portwatch.json` (shared with [PortWatch](https://github.com/martin-santiago/portwatch) macOS app):
+Stored at `~/.portwatch.json`:
 
 ```json
 {
@@ -161,6 +196,10 @@ Stored at `~/.portwatch.json` (shared with [PortWatch](https://github.com/martin
 | `filter_ports` | Ports shown when filter mode is ON | `[3001, 3002, 3003, 3005, 7000, 8000]` |
 | `filter_enabled` | Whether filter mode is active | `false` |
 | `refresh_interval_seconds` | TUI auto-refresh interval | `3` |
+
+Edit this file directly if you prefer — changes apply on the next refresh.
+
+---
 
 ## How It Works
 
@@ -181,26 +220,30 @@ pw (no args)                     pw list|kill|filter
     └──────────┘                    └──────────┘
 ```
 
-- **`main.go`** — Entry point, CLI arg routing, interactive loop
-- **`ports.go`** — Port scanning (macOS: `lsof`, Linux: `ss`/`netstat`), kill (SIGTERM/SIGKILL), filter logic
-- **`config.go`** — Thread-safe config with JSON persistence
-- **`terminal.go`** — Raw terminal mode, ANSI codes, key reading
-- **`ui.go`** — TUI rendering (port list, filter editor, add port dialog)
+| File | Role |
+|---|---|
+| `main.go` | Entry point, CLI arg routing, interactive loop |
+| `ports.go` | Port scanning (macOS: `lsof`, Linux: `ss`/`netstat`), kill, filter |
+| `config.go` | Thread-safe config with JSON persistence |
+| `terminal.go` | Raw terminal mode, ANSI escape codes, key input |
+| `ui.go` | TUI rendering (port list, filter editor, add port dialog) |
+
+---
 
 ## Makefile
 
 | Command | Description |
 |---|---|
 | `make build` | Build binary to `build/pw` |
-| `make run` | Build and run |
-| `make install` | Install to `/usr/local/bin/pw` (global) |
-| `make uninstall` | Remove from `/usr/local/bin/` |
+| `make run` | Build and run interactively |
+| `make install` | Install globally (`~/.local/bin` on Linux, `/usr/local/bin` on macOS) |
+| `make uninstall` | Remove from install path |
 | `make clean` | Delete `build/` directory |
 
 ## Uninstall
 
 ```bash
-make uninstall              # remove binary from PATH
+make uninstall              # remove pw binary
 rm ~/.portwatch.json        # remove config (optional)
 ```
 
