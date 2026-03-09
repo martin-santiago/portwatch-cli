@@ -1,6 +1,14 @@
 BINARY = pw
 BUILD_DIR = build
 
+# Use ~/.local/bin on Linux (no sudo), /usr/local/bin on macOS
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	INSTALL_DIR = /usr/local/bin
+else
+	INSTALL_DIR = $(HOME)/.local/bin
+endif
+
 .PHONY: build run clean install uninstall
 
 build:
@@ -17,9 +25,11 @@ clean:
 	@echo "Cleaned."
 
 install: build
-	@cp $(BUILD_DIR)/$(BINARY) /usr/local/bin/$(BINARY)
-	@echo "Installed to /usr/local/bin/$(BINARY)"
+	@mkdir -p $(INSTALL_DIR)
+	@cp $(BUILD_DIR)/$(BINARY) $(INSTALL_DIR)/$(BINARY)
+	@echo "Installed to $(INSTALL_DIR)/$(BINARY)"
+	@echo "Run 'pw' from any directory."
 
 uninstall:
-	@rm -f /usr/local/bin/$(BINARY)
-	@echo "Uninstalled $(BINARY)."
+	@rm -f $(INSTALL_DIR)/$(BINARY)
+	@echo "Uninstalled $(BINARY) from $(INSTALL_DIR)."
